@@ -140,7 +140,7 @@
                     "properties": {
 					"packageUri": "https://auxmktplceprod.blob.core.windows.net/packages/drupal8-rc3.zip",
 						"dbType": "MySQL",
-						"connectionString": "[variables('connectionString')]",parameters('databaseName'))).connectionString]",
+						"connectionString": "[variables('connectionString')]",
 						"setParameters": {
 						  "Application Path": "[parameters('siteName')]",
 						  "mdbServer": "[parameters('dbServer')]",
