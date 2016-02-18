@@ -139,16 +139,16 @@
                     ],
                     "properties": {
 					"packageUri": "https://auxmktplceprod.blob.core.windows.net/packages/drupal8-rc3.zip",
-            "dbType": "MySQL",
-            "connectionString": "[variables('connectionString')]",parameters('databaseName'))).connectionString]",
-            "setParameters": {
-              "Application Path": "[parameters('siteName')]",
-              "mdbServer": "[parameters('dbServer')]",
-              "mdbName": "[parameters('dbName')]",
-              "mdbUsername": "[parameters('dbUsername')]",
-              "mdbUserPassword": "[parameters('dbPassword')]",
-              "mdbAdminUsername": "[parameters('dbAdminUsername')]",
-              "mdbAdminPassword": "[parameters('dbAdminPassword')]",
+						"dbType": "MySQL",
+						"connectionString": "[variables('connectionString')]",parameters('databaseName'))).connectionString]",
+						"setParameters": {
+						  "Application Path": "[parameters('siteName')]",
+						  "mdbServer": "[parameters('dbServer')]",
+						  "mdbName": "[parameters('dbName')]",
+						  "mdbUsername": "[parameters('dbUsername')]",
+						  "mdbUserPassword": "[parameters('dbPassword')]",
+						  "mdbAdminUsername": "[parameters('dbAdminUsername')]",
+						  "mdbAdminPassword": "[parameters('dbAdminPassword')]"
                         
                         }
                     }
