@@ -1,0 +1,682 @@
+﻿{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "dnsName": {
+            "type": "string",
+            "metadata": {
+                "description": "Connect to your cluster using dnsName.location.cloudapp.azure.com"
+            }
+        },
+        "location": {
+            "type": "string",
+            "metadata": {
+                "description": "Location where the varnish cluster will be deployed to"
+            }
+        },
+        "vmUserName": {
+            "type": "string",
+            "metadata": {
+                "description": "user name to ssh to the VMs"
+            }
+        },
+        "vmPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "password to ssh to the VMs"
+            }
+        },        
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2",
+            "metadata": {
+                "description": "size for the VMs"
+            }
+        },
+        "storageAccountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "metadata": {
+                "description": "Storage account type for the cluster"
+            }
+        },
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "varnishvnet",
+            "metadata": {
+                "description": "Virtual network name for the cluster"
+            }
+        },
+        "vnetNewOrExisting": {
+            "type": "string",
+            "defaultValue": "new",
+            "allowedValues": [
+                "new",
+                "existing"
+            ],
+            "metadata": {
+                "description": "Identifies whether to use new or existing Virtual Network"
+            }
+        },
+        "virtualNetworkExistingRGName": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "If using existing VNet, specifies the resource group for the existing VNet"
+            }
+        },
+        "dbSubnetName": {
+            "type": "string",
+            "defaultValue": "dbsubnet",
+            "metadata": {
+                "description": "subnet name for the varnish nodes"
+            }
+        },
+        "vnetAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16",
+            "metadata": {
+                "description": "IP address in CIDR for virtual network"
+            }
+        },
+        "dbSubnetAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.1.0/24",
+            "metadata": {
+                "description": "IP address in CIDR for db subnet"
+            }
+        },
+        "dbSubnetStartAddress": {
+            "type": "string",
+            "defaultValue": "10.0.1.4",
+            "metadata": {
+                "description": "Start IP address in the subnet for the VMs"
+            }
+        },
+        "imagePublisher": {
+            "type": "string",
+            "defaultValue": "OpenLogic",
+            "allowedValues": [
+                "OpenLogic"
+            ],
+            "metadata": {
+                "description": "publisher for the VM OS image"
+            }
+        },
+        "imageOffer": {
+            "type": "string",
+            "defaultValue": "CentOS",
+            "allowedValues": [
+                "CentOS"
+            ],
+            "metadata": {
+                "description": "VM OS name"
+            }
+        },
+        "imageSKU": {
+            "type": "string",
+            "defaultValue": "6.6",
+            "allowedValues": [
+                "6.5",
+                "6.6"
+            ],
+            "metadata": {
+                "description": "VM OS version"
+            }
+        },
+        "varnishFrontEndPort0": {
+            "type": "int",
+            "defaultValue": 3306,
+            "metadata": {
+                "description": "varnish public port master"
+            }
+        },
+        "varnishFrontEndPort1": {
+            "type": "int",
+            "defaultValue": 3307,
+            "metadata": {
+                "description": "varnish public port slave"
+            }
+        },
+        "sshNatRuleFrontEndPort0": {
+            "type": "int",
+            "defaultValue": 64001,
+            "metadata": {
+                "description": "public ssh port for VM1"
+            }
+        },
+        "sshNatRuleFrontEndPort1": {
+            "type": "int",
+            "defaultValue": 64002,
+            "metadata": {
+                "description": "public ssh port for VM2"
+            }
+        },       
+        "artifactsPath": {
+            "type": "string",
+            "defaultValue": "https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/varnish-replication",
+            "metadata": {
+                "description": "template and script file location",
+                "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
+            }
+        },
+        "customScriptCommandToExecute": {
+            "type": "string",
+            "defaultValue": "bash azurevarnish.sh",
+            "metadata": {
+                "description": "bash script command line"
+            }
+        },
+        "publicIPName": {
+            "type": "string",
+            "defaultValue": "varnishIP01",
+            "metadata": {
+                "description": "public IP name for varnish loadbalancer"
+            }
+        },
+        "storageAccountNamePrefix": {
+          "type": "string",
+          "metadata": {
+              "description": "Storage account name prefix for the cluster"
+          }
+        },
+        "siteName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the web app that you wish to create."
+      }
+    },
+    "hostingPlanName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the App Service plan to use for hosting the web app."
+      }
+    },
+    "siteLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "The location to use for creating the web app and hosting plan. It must be one of the Azure locations that support web apps."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Shared",
+        "Basic",
+        "Standard"
+      ],
+      "defaultValue": "Free",
+      "metadata": {
+        "description": "The pricing tier for the hosting plan."
+      }
+    },
+    "workerSize": {
+      "type": "string",
+      "allowedValues": [
+        "0",
+        "1",
+        "2"
+      ],
+      "defaultValue": "0",
+      "metadata": {
+        "description": "The instance size of the hosting plan (small, medium, or large)."
+      }
+    },
+    "redisCacheName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the Azure Redis Cache to create."
+      }
+    },
+    "redisCacheSKU": {
+      "type": "string",
+      "allowedValues": [
+        "Basic",
+        "Standard"
+      ],
+      "defaultValue": "Basic",
+      "metadata": {
+        "description": "The pricing tier of the new Azure Redis Cache."
+      }
+    },
+    "redisCacheFamily": {
+      "type": "string",
+      "defaultValue": "C",
+      "metadata": {
+        "description": "The family for the sku."
+      }
+    },
+    "redisCacheCapacity": {
+      "type": "int",
+      "allowedValues": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "defaultValue": 0,
+      "metadata": {
+        "description": "The size of the new Azure Redis Cache instance. "
+      }
+    },
+    "redisCacheVersion": {
+      "type": "string",
+      "defaultValue": "2.8",
+      "metadata": {
+        "description": "The Redis server version of the new cache."
+      }
+    }
+    },
+    "variables": {
+        "templateAPIVersion": "2015-01-01",
+        "resourceAPIVersion": "2015-06-15",
+
+        "region": "[parameters('location')]",
+        "nodeCount": 1,
+        "lbPublicIPName": "[parameters('publicIPName')]",
+        "lbPublicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses',variables('lbPublicIPName'))]",
+        "lbName": "[concat(parameters('dnsName'), '-lb')]",
+        "lbID": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
+        "ilbBackendAddressPoolName": "[concat(parameters('dnsName'), '-ilbBackendPool')]",
+        "ilbBackendAddressPoolID": "[concat(variables('lbID'),'/backendAddressPools/', variables('ilbBackendAddressPoolName'))]",
+        "ilbRuleName": "[concat(parameters('dnsName'), '-ilbRule')]",
+        "ilbRuleID": "[concat(variables('lbID'),'/loadBalancingRules/',variables('ilbRuleName'))]",
+        "sshIPConfigName": "[concat(parameters('dnsName'), '-sshIPCfg')]",
+        "sshIPConfig": "[concat(variables('lbID'),'/frontendIPConfigurations/',variables('sshIPConfigName'))]",
+        "nicName": "[concat(parameters('dnsName'), '-nic')]",
+        "availabilitySetName": "[concat(parameters('dnsName'), '-set')]",
+        "storageAccountName": "[concat(parameters('storageAccountNamePrefix'), '0')]",
+        "vhdContainer": "[concat('http://',variables('storageAccountName'),'.blob.core.windows.net/vhds/')]",
+        "customScriptFilePath": "[concat(parameters('artifactsPath'), '/azurevarnish.sh')]",        
+        "singleQuote": "'",
+        "virtualNetworkSetupURL": "[concat(parameters('artifactsPath'),'/vnet-',parameters('vnetNewOrExisting'),'.json')]",
+        "sa": "[parameters('dbSubnetStartAddress')]",
+        "ipOctet01": "[concat(split(variables('sa'), '.')[0], '.', split(variables('sa'), '.')[1], '.')]",
+        "ipOctet2": "[int(split(variables('sa'), '.')[2])]",
+        "ipOctet3": "[int(split(variables('sa'), '.')[3])]"
+    },
+    "resources": [
+         {
+      "apiVersion": "2014-04-01-preview",
+      "name": "[parameters('redisCacheName')]",
+      "type": "Microsoft.Cache/Redis",
+      "location": "[parameters('siteLocation')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('redisCacheSKU')]",
+          "family": "[parameters('redisCacheFamily')]",
+          "capacity": "[parameters('redisCacheCapacity')]"
+        },
+        "redisVersion": "[parameters('redisCacheVersion')]",
+        "enableNonSslPort": true
+      }
+    },
+    {
+      "apiVersion": "2015-04-01",
+      "name": "[parameters('hostingPlanName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "location": "[parameters('siteLocation')]",
+      "properties": {
+        "name": "[parameters('hostingPlanName')]",
+        "sku": "[parameters('sku')]",
+        "workerSize": "[parameters('workerSize')]",
+        "numberOfWorkers": 1
+      }
+    },
+    {
+      "apiVersion": "2015-04-01",
+      "name": "[parameters('siteName')]",
+      "type": "Microsoft.Web/sites",
+      "location": "[parameters('siteLocation')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/serverFarms', parameters('hostingPlanName'))]",
+        "[resourceId('Microsoft.Cache/Redis', parameters('redisCacheName'))]"
+      ],
+      "properties": {
+        "serverFarmId": "[parameters('hostingPlanName')]"
+      },
+      "resources": [
+        {
+          "apiVersion": "2015-06-01",
+          "type": "config",
+          "name": "web",
+          "dependsOn": [
+            "[resourceId('Microsoft.Web/Sites', parameters('siteName'))]"
+          ],
+          "properties": {
+            "appSettings": [
+              {
+                "name": "REDIS_HOST",
+                "value": "[concat(parameters('siteName'), '.redis.cache.windows.net:6379')]"
+              },
+              {
+                "name": "REDIS_KEY",
+                "value": "[listKeys(resourceId('Microsoft.Cache/Redis', parameters('redisCacheName')), '2014-04-01').primaryKey]"
+              }
+            ]
+          }
+        }
+      ]
+    },
+        {
+            "name": "SettingUpVirtualNetwork",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "[variables('templateAPIVersion')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('virtualNetworkSetupURL')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "virtualNetworkName": {
+                        "value": "[parameters('virtualNetworkName')]"
+                    },
+                    "location": {
+                        "value": "[variables('region')]"
+                    },
+                    "virtualNetworkAddressPrefix": {
+                        "value": "[parameters('vnetAddressPrefix')]"
+                    },
+                    "dbSubnetName": {
+                        "value": "[parameters('dbSubnetName')]"
+                    },
+                    "dbSubnetAddressPrefix": {
+                        "value": "[parameters('dbSubnetAddressPrefix')]"
+                    },
+                    "virtualNetworkExistingRGName": {
+                        "value": "[parameters('virtualNetworkExistingRGName')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[variables('storageAccountName')]",
+            "apiVersion": "[variables('resourceAPIVersion')]",
+            "location": "[variables('region')]",
+            "properties": {
+                "accountType": "[parameters('storageAccountType')]"
+            }
+        },
+        {
+            "apiVersion": "[variables('resourceAPIVersion')]",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[variables('lbPublicIPName')]",
+            "location": "[variables('region')]",
+            "properties": {
+                "publicIPAllocationMethod": "Static",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('dnsName')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/availabilitySets",
+            "name": "[variables('availabilitySetName')]",
+            "apiVersion": "[variables('resourceAPIVersion')]",
+            "location": "[variables('region')]",
+            "properties": { }
+        },
+        {
+            "apiVersion": "[variables('resourceAPIVersion')]",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[concat(variables('nicName'), copyIndex())]",
+            "location": "[variables('region')]",
+            "copy": {
+                "name": "nicLoop",
+                "count": "[variables('nodeCount')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Resources/deployments/', 'SettingUpVirtualNetwork')]",
+                "[concat('Microsoft.Network/loadBalancers/', variables('lbName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "[concat('ipconfig', copyIndex())]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "privateIPAddress": "[concat(variables('ipOctet01'), add(variables('ipOctet2'), div(copyIndex(variables('ipOctet3')), 255)), '.', mod(copyIndex(variables('ipOctet3')), 255))]",
+                            "subnet": {
+                                "id": "[reference('Microsoft.Resources/deployments/SettingUpVirtualNetwork', variables('templateAPIVersion')).outputs.dbSubnetRef.value]"
+                            },
+                            "loadBalancerBackendAddressPools": [
+                                {
+                                    "id": "[variables('ilbBackendAddressPoolID')]"
+                                }
+                            ],
+                            "loadBalancerInboundNatRules": [
+                                {
+                                    "id": "[concat(variables('lbID'),'/inboundNatRules/',parameters('dnsName'), 'NatRule', copyIndex())]"
+                                },
+                                {
+                                    "id": "[concat(variables('lbID'),'/inboundNatRules/',parameters('dnsName'), 'ProbeNatRule', copyIndex())]"
+                                },
+                                {
+                                    "id": "[concat(variables('lbID'),'/inboundNatRules/',parameters('dnsName'), 'varnishNatRule', copyIndex())]"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "name": "[concat(parameters('dnsName'), copyIndex())]",
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "[variables('resourceAPIVersion')]",
+            "location": "[variables('region')]",
+            "copy": {
+                "name": "vmLoop",
+                "count": "[variables('nodeCount')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/availabilitySets/', variables('availabilitySetName'))]",
+                "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))]",
+                "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyIndex())]"
+            ],
+            "properties": {
+                "availabilitySet": {
+                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+                },
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[concat(parameters('dnsName'), copyIndex())]",
+                    "adminUsername": "[parameters('vmUserName')]",
+                    "adminPassword": "[parameters('vmPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[parameters('imagePublisher')]",
+                        "offer": "[parameters('imageOffer')]",
+                        "sku": "[parameters('imageSKU')]",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "name": "osdisk",
+                        "vhd": {
+                            "uri": "[concat(variables('vhdContainer'), parameters('dnsName'), copyIndex(), 'osdisk.vhd')]"
+                        },
+                        "caching": "ReadWrite",
+                        "createOption": "FromImage"
+                    },
+                    "dataDisks": [
+                        {
+                            "name": "datadisk1",
+                            "diskSizeGB": "1000",
+                            "lun": 0,
+                            "vhd": {
+                                "Uri": "[concat(variables('vhdContainer'), parameters('dnsName'), copyIndex(), 'dataDisk1.vhd')]"
+                            },
+                            "createOption": "Empty"
+                        },
+                        {
+                            "name": "datadisk2",
+                            "diskSizeGB": "1000",
+                            "lun": 1,
+                            "vhd": {
+                                "Uri": "[concat(variables('vhdContainer'), parameters('dnsName'), copyIndex(), 'dataDisk2.vhd')]"
+                            },
+                            "createOption": "Empty"
+                        }
+                    ]
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[concat(resourceId('Microsoft.Network/networkInterfaces',variables('nicName')), copyIndex())]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('dnsName'), copyIndex(), '/setupvarnish')]",
+            "apiVersion": "[variables('resourceAPIVersion')]",
+            "location": "[variables('region')]",
+            "copy": {
+                "name": "extLoop",
+                "count": "[variables('nodeCount')]"
+            },
+            "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachines/', parameters('dnsName'), copyIndex())]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.OSTCExtensions",
+                "type": "CustomScriptForLinux",
+                "typeHandlerVersion": "1.4",
+                "settings": {
+                    "fileUris": [
+                        "[variables('customScriptFilePath')]"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "[concat(parameters('customScriptCommandToExecute'), ' ', copyIndex(1), ' ', variables('ipOctet01'), add(variables('ipOctet2'), div(copyIndex(variables('ipOctet3')), 255)), '.', mod(copyIndex(variables('ipOctet3')), 255), ' ', variables('varnishConfigFilePath'), ' ', variables('singleQuote'), parameters('varnishReplicationPassword'), variables('singleQuote'), ' ', variables('singleQuote'), parameters('varnishRootPassword'), variables('singleQuote'), ' ', variables('singleQuote'), parameters('varnishProbePassword'), variables('singleQuote'), ' ', parameters('dbSubnetStartAddress'))]",
+                    "Items": {
+                        "varnishRootPassword": "[parameters('varnishRootPassword')]",
+                        "varnishReplicationPassword": "[parameters('varnishReplicationPassword')]",
+                        "varnishProbePassword": "[parameters('varnishProbePassword')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "[variables('resourceAPIVersion')]",
+            "type": "Microsoft.Network/loadBalancers",
+            "name": "[variables('lbName')]",
+            "location": "[variables('region')]",
+            "dependsOn": [
+                "[concat('Microsoft.Network/publicIPAddresses/', variables('lbPublicIPName'))]"
+            ],
+            "properties": {
+                "frontendIPConfigurations": [
+                    {
+                        "name": "[variables('sshIPConfigName')]",
+                        "properties": {
+                            "publicIPAddress": {
+                                "id": "[variables('lbPublicIPRef')]"
+                            }
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "[variables('ilbBackendAddressPoolName')]"
+                    }
+                ],
+                "inboundNatRules": [
+                    {
+                        "name": "[concat(parameters('dnsName'),'NatRule0')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('sshIPConfig')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": "[parameters('sshNatRuleFrontEndPort0')]",
+                            "backendPort": 22,
+                            "enableFloatingIP": false
+                        }
+                    },
+                    {
+                        "name": "[concat(parameters('dnsName'),'NatRule1')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('sshIPConfig')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": "[parameters('sshNatRuleFrontEndPort1')]",
+                            "backendPort": 22,
+                            "enableFloatingIP": false
+                        }
+                    },
+                    {
+                        "name": "[concat(parameters('dnsName'),'varnishNatRule0')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('sshIPConfig')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": "[parameters('varnishFrontEndPort0')]",
+                            "backendPort": 80,
+                            "enableFloatingIP": false
+                        }
+                    },
+                    {
+                        "name": "[concat(parameters('dnsName'),'varnishNatRule1')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('sshIPConfig')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": "[parameters('varnishFrontEndPort1')]",
+                            "backendPort": 80,
+                            "enableFloatingIP": false
+                        }
+                    },
+                    {
+                        "name": "[concat(parameters('dnsName'),'ProbeNatRule0')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('sshIPConfig')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": "[parameters('varnishProbePort0')]",
+                            "backendPort": 6082,
+                            "enableFloatingIP": false
+                        }
+                    },
+                    {
+                        "name": "[concat(parameters('dnsName'),'ProbeNatRule1')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[variables('sshIPConfig')]"
+                            },
+                            "protocol": "tcp",
+                            "frontendPort": "[parameters('varnishProbePort1')]",
+                            "backendPort": 6082,
+                            "enableFloatingIP": false
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": {
+        "fqdn": {
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('lbPublicIPName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn]",
+            "type": "string"
+        },
+        "ipaddress": {
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',variables('lbPublicIPName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).ipAddress]",
+            "type": "string"
+        }
+    }
+}
