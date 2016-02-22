@@ -18,13 +18,13 @@
         ],
         "steps": [
             {
-                "name": "wordpressInfo",
-                "label": "WordPress information",
+                "name": "Drupal Info",
+                "label": "Drupal information",
                 "subLabel": {
-                    "preValidation": "Provide WordPress information",
+                    "preValidation": "Provide Drupal information",
                     "postValidation": "Done"
                 },
-                "bladeTitle": "WordPress information",
+                "bladeTitle": "Drupal information",
                 "elements": [
                     {
                         "name": "sku",
@@ -79,7 +79,7 @@
                         "type": "Microsoft.Common.TextBox",
                         "label": "Web site hosting plan",
                         "toolTip": "",
-                        "defaultValue": "wordpressMySQLplan",
+                        "defaultValue": "DrupalMySQLplan",
                         "constraints": {
                             "required": true,
                             "regex": "^[a-z0-9A-Z]{1,40}$",
@@ -87,10 +87,10 @@
                         }
                     },
                     {
-                        "name": "wpDBUser",
+                        "name": "AppDBUser",
                         "type": "Microsoft.Compute.UserNameTextBox",
                         "label": "web site db user name",
-                        "defaultValue": "wpuser",
+                        "defaultValue": "drupal8user",
                         "toolTip": "",
                         "constraints": {
                             "required": true
@@ -98,7 +98,7 @@
                         "osPlatform": "Linux"
                     },
                     {
-                        "name": "wpDBPassword",
+                        "name": "AppDBPassword",
                         "type": "Microsoft.Common.PasswordBox",
                         "label": {
                             "password": "Web site db user password",
@@ -299,16 +299,8 @@
             "hostingPlanName": "[steps('wordpressInfo').webSiteHostingPlan]",
             "sku": "[steps('wordpressInfo').sku]",
             "workerSize": "[steps('wordpressInfo').workerSize]",
-            "wpDbUsername": "[steps('wordpressInfo').wpDBUser]",
-            "wpDbPassword": "[steps('wordpressInfo').wpDBPassword]",
-            "webDeploy_AuthenticationKey": "[steps('wordpressInfo').wpDBPassword]",
-            "webDeploy_SecureAuthenticationKey": "[steps('wordpressInfo').wpDBPassword]",
-            "webDeploy_LoggedInKey": "[steps('wordpressInfo').wpDBPassword]",
-            "webDeploy_NonceKey": "[steps('wordpressInfo').wpDBPassword]",
-            "webDeploy_AuthenticationSalt": "[steps('wordpressInfo').wpDBPassword]",
-            "webDeploy_SecureAuthenticationSalt": "[steps('wordpressInfo').wpDBPassword]",
-            "webDeploy_LoggedInSalt": "[steps('wordpressInfo').wpDBPassword]",
-            "webDeploy_NonceSalt": "[steps('wordpressInfo').wpDBPassword]",
+            "AppDbUsername": "[steps('wordpressInfo').AppDBUser]",
+            "AppDbPassword": "[steps('wordpressInfo').AppDBPassword]",
             "dnsName": "[steps('databaseCluster').dbDNSName.domainNameLabel]",
             "location": "[location()]",
             "publicIPName": "[steps('databaseCluster').dbDNSName.name]",
