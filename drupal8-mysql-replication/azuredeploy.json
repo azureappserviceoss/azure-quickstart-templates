@@ -105,14 +105,14 @@
                 "description": "public IP name for MySQL loadbalancer"
             }
         },
-        "wpDbUsername": {
+        "AppDbUsername": {
             "type": "string",
             "defaultValue": "wpuser",
             "metadata": {
                 "description": "wordpress db username"
             }
         },
-        "wpDbPassword": {
+        "AppDbPassword": {
             "type": "securestring",
             "metadata": {
                 "description": "wordpress db password"
@@ -377,20 +377,12 @@
                     "serverFarmResourceGroup": { "value": "[resourceGroup().name]" },
                     "sku": { "value": "[parameters('sku')]" },
                     "workerSize": { "value": "[parameters('workerSize')]" },
-                    "webDeploy_AuthenticationKey": { "value": "[parameters('webDeploy_AuthenticationKey')]" },
-                    "webDeploy_SecureAuthenticationKey": { "value": "[parameters('webDeploy_SecureAuthenticationKey')]" },
-                    "webDeploy_LoggedInKey": { "value": "[parameters('webDeploy_LoggedInKey')]" },
-                    "webDeploy_NonceKey": { "value": "[parameters('webDeploy_NonceKey')]" },
-                    "webDeploy_AuthenticationSalt": { "value": "[parameters('webDeploy_AuthenticationSalt')]" },
-                    "webDeploy_SecureAuthenticationSalt": { "value": "[parameters('webDeploy_SecureAuthenticationSalt')]" },
-                    "webDeploy_LoggedInSalt": { "value": "[parameters('webDeploy_LoggedInSalt')]" },
-                    "webDeploy_NonceSalt": { "value": "[parameters('webDeploy_NonceSalt')]" },
-                    "DbServer": { "value": "[concat(parameters('dnsName'), '.', parameters('location'), '.cloudapp.azure.com')]" },
-                    "DbName": { "value": "wordpress" },
-                    "DbUsername": { "value": "[parameters('wpDbUsername')]" },
-                    "DbPassword": { "value": "[parameters('wpDbPassword')]" },
-                    "DbAdminUsername": { "value": "wpadmin" },
-                    "DbAdminPassword": { "value": "[parameters('mysqlRootPassword')]" }
+                    "mdbServer": { "value": "[concat(parameters('dnsName'), '.', parameters('location'), '.cloudapp.azure.com')]" },
+                    "mdbName": { "value": "drupaldb8" },
+                    "mdbUsername": { "value": "[parameters('AppDbUsername')]" },
+                    "mdbUserPassword": { "value": "[parameters('AppDbPassword')]" },
+                    "mdbAdminUsername": { "value": "wpadmin" },
+                    "mdbAdminPassword": { "value": "[parameters('mysqlRootPassword')]" }
                 }
             }
         }
