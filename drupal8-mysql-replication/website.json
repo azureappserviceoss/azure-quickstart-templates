@@ -34,46 +34,22 @@
             ],
             "defaultValue": "0"
         },
-        "webDeploy_AuthenticationKey": {
-            "type": "securestring"
-        },
-        "webDeploy_SecureAuthenticationKey": {
-            "type": "securestring"
-        },
-        "webDeploy_LoggedInKey": {
-            "type": "securestring"
-        },
-        "webDeploy_NonceKey": {
-            "type": "securestring"
-        },
-        "webDeploy_AuthenticationSalt": {
-            "type": "securestring"
-        },
-        "webDeploy_SecureAuthenticationSalt": {
-            "type": "securestring"
-        },
-        "webDeploy_LoggedInSalt": {
-            "type": "securestring"
-        },
-        "webDeploy_NonceSalt": {
-            "type": "securestring"
-        },
-        "dbServer": {
+        "mdbServer": {
             "type": "string"
         },
-        "dbName": {
+        "mdbName": {
             "type": "string"
         },
-        "dbUsername": {
+        "mdbUsername": {
             "type": "string"
         },
-        "dbPassword": {
+        "mdbUserPassword": {
             "type": "securestring"
         },
-        "dbAdminUsername": {
+        "mdbAdminUsername": {
             "type": "string"
         },
-        "dbAdminPassword": {
+        "mdbAdminPassword": {
             "type": "securestring"
         }
     },
