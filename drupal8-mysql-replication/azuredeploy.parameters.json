@@ -17,30 +17,6 @@
         "hostingPlanName": {
             "value": "mysiteplan"
         },
-        "webDeploy_AuthenticationKey": {
-            "value": ""
-        },
-        "webDeploy_SecureAuthenticationKey": {
-            "value": ""
-        },
-        "webDeploy_LoggedInKey": {
-            "value": ""
-        },
-        "webDeploy_NonceKey": {
-            "value": ""
-        },
-        "webDeploy_AuthenticationSalt": {
-            "value": ""
-        },
-        "webDeploy_SecureAuthenticationSalt": {
-            "value": ""
-        },
-        "webDeploy_LoggedInSalt": {
-            "value": ""
-        },
-        "webDeploy_NonceSalt": {
-            "value": ""
-        },
         "vmUserName": {
             "value": ""
         },
@@ -56,7 +32,7 @@
         "mysqlProbePassword": {
             "value": ""
         },
-        "wpDbPassword": { 
+        "AppDbPassword": { 
             "value": ""
         }
     }
