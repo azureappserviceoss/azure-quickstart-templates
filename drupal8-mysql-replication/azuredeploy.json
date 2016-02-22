@@ -38,54 +38,6 @@
                 "description": "website worker size"
             }
         },
-        "webDeploy_AuthenticationKey": {
-            "type": "securestring",
-            "metadata": {
-                "description": "webdeploy authentication key"
-            }
-        },
-        "webDeploy_SecureAuthenticationKey": {
-            "type": "securestring",
-            "metadata": {
-                "description": "webdeploy secure authentication key"
-            }
-        },
-        "webDeploy_LoggedInKey": {
-            "type": "securestring",
-            "metadata": {
-                "description": "webdeploy logged in key"
-            }
-        },
-        "webDeploy_NonceKey": {
-            "type": "securestring",
-            "metadata": {
-                "description": "webdeploy nonce key"
-            }
-        },
-        "webDeploy_AuthenticationSalt": {
-            "type": "securestring",
-            "metadata": {
-                "description": "webdeploy authentication salt"
-            }
-        },
-        "webDeploy_SecureAuthenticationSalt": {
-            "type": "securestring",
-            "metadata": {
-                "description": "webdeploy secure authentication salt"
-            }
-        },
-        "webDeploy_LoggedInSalt": {
-            "type": "securestring",
-            "metadata": {
-                "description": "webdeploy logged in salt"
-            }
-        },
-        "webDeploy_NonceSalt": {
-            "type": "securestring",
-            "metadata": {
-                "description": "webdeploy nonce salt"
-            }
-        },
         "dnsName": {
             "type": "string",
             "metadata": {
