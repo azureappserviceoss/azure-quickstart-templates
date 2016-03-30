@@ -255,7 +255,7 @@
         },
         "websiteTemplateLocation": {
             "type": "string",
-            "defaultValue": "https://raw.githubusercontent.com/azure/azure-quickstart-templates/master/wordpress-mysql-replication",
+            "defaultValue": "https://raw.githubusercontent.com/SunBuild/azure-quickstart-templates/master/drupal8-mysql-replication",
             "metadata": {
                 "description": "template file location",
                 "artifactsBaseUrl": "Base URL of the Publisher Template gallery package"
