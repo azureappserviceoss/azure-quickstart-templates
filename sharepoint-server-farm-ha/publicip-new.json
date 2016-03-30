@@ -20,7 +20,7 @@
   },
   "resources": [
     {
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2015-06-15",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[parameters('publicIPAddressName')]",
       "location": "[parameters('location')]",
@@ -39,6 +39,10 @@
     },
     "fqdn": {
       "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).dnsSettings.fqdn]",
+      "type": "string"
+    },
+    "ipaddress": {
+      "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses',parameters('publicIPAddressName')),providers('Microsoft.Network', 'publicIPAddresses').apiVersions[0]).ipAddress]",
       "type": "string"
     }
   }

@@ -62,7 +62,7 @@
   },
 
   "variables": {
-    "windowsOSVersion": "2016-Technical-Preview-3-with-Containers",
+    "windowsOSVersion": "2016-Technical-Preview-with-Containers",
     "imagePublisher": "MicrosoftWindowsServer",
     "imageOffer": "WindowsServer",
     "OSDiskName": "[concat(parameters('VMName'),'_osdisk')]",
@@ -172,6 +172,9 @@
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[variables('virtualNetworkName')]",
       "location": "[parameters('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]"
+      ],
       "tags": {
         "displayName": "VirtualNetwork"
       },
@@ -185,7 +188,10 @@
           {
             "name": "[variables('subnetName')]",
             "properties": {
-              "addressPrefix": "[variables('subnetPrefix')]"
+              "addressPrefix": "[variables('subnetPrefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+              }
             }
           }
         ]
@@ -225,7 +231,7 @@
     {
       "apiVersion": "[variables('apiVersion')]",
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[parameters('vmName')]",
+      "name": "[parameters('VMName')]",
       "location": "[parameters('location')]",
       "tags": {
         "displayName": "VirtualMachine"
@@ -239,7 +245,7 @@
           "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
-          "computername": "[parameters('vmName')]",
+          "computername": "[parameters('VMName')]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -267,32 +273,32 @@
           ]
         }
       },
-        "resources": [
-            {
-                "name": "containerConfiguration",
-                "type": "extensions",
-                "location": "[parameters('location')]",
-                "apiVersion": "2015-06-15",
-                "dependsOn": [
-                    "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
-                ],
-                "tags": {
-                    "displayName": "containerConfiguration"
-                },
-                "properties": {
-                    "publisher": "Microsoft.Compute",
-                    "type": "CustomScriptExtension",
-                    "typeHandlerVersion": "1.2",
-                    "autoUpgradeMinorVersion": true,
-                    "settings": {
-                        "fileUris": [
-                            "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/windows-server-containers-preview/containerConfig.ps1"
-                        ],
-                        "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File containerConfig.ps1"
-                    }
-                }
+      "resources": [
+        {
+          "name": "containerConfiguration",
+          "type": "extensions",
+          "location": "[parameters('location')]",
+          "apiVersion": "2015-06-15",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('VMName'))]"
+          ],
+          "tags": {
+            "displayName": "containerConfiguration"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.2",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/windows-server-containers-preview/containerConfig.ps1"
+              ],
+              "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File containerConfig.ps1"
             }
-        ]
+          }
+        }
+      ]
     }
   ]
 }

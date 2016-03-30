@@ -209,7 +209,7 @@
           "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
-          "computername": "[variables('vmNamePrefix')]",
+          "computerName": "[variables('vmNamePrefix')]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -248,7 +248,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
              "enabled": "true",
-             "storageUri": "[concat('http://',parameters('newStorageAccountName'),'.blob.core.windows.net')]"
+             "storageUri": "[concat('http://',parameters('StorageAccountName'),'.blob.core.windows.net')]"
           }
         }
       }
