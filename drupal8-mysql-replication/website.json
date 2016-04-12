@@ -54,7 +54,7 @@
         }
     },
     "variables": { 
-        "connectionString": "[concat('Server=', parameters('dbServer'), ';Database=', parameters('dbName'), ';Uid=admin;Pwd=', parameters('dbAdminPassword'), ';')]"
+        "connectionString": "[concat('Server=', parameters('mdbServer'), ';Database=', parameters('mdbName'), ';Uid=',parameters('mdbAdminUsername'),';Pwd=', parameters('mdbAdminPassword'), ';')]"
     },
     "resources": [
         {
